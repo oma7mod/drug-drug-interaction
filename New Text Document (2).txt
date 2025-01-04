@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Drug Interaction Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .interaction-level {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .severe {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .moderate {
+            background: #ffd93d;
+            color: black;
+        }
+
+        .mild {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .none {
+            background: #a8e6cf;
+            color: black;
+        }
+
+        .points-list {
+            list-style-type: none;
+        }
+
+        .points-list li {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-right: 4px solid #3498db;
+        }
+
+        .points-list li::before {
+            content: "•";
+            color: #3498db;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>حاسبة تفاعلات الأدوية</h1>
+        <div class="input-section">
+            <input type="text" id="drug1" placeholder="اسم الدواء الأول" required>
+            <input type="text" id="drug2" placeholder="اسم الدواء الثاني" required>
+            <button onclick="checkInteraction()">تحقق من التفاعل</button>
+        </div>
+        <div id="result" class="result" style="display: none;">
+            <div id="severity" class="interaction-level"></div>
+            <ul id="interactionDetails" class="points-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        async function checkInteraction() {
+            const drug1 = document.getElementById('drug1').value;
+            const drug2 = document.getElementById('drug2').value;
+            const resultDiv = document.getElementById('result');
+            const severityDiv = document.getElementById('severity');
+            const detailsList = document.getElementById('interactionDetails');
+
+            if (!drug1 || !drug2) {
+                alert('الرجاء إدخال اسم كلا الدوائين');
+                return;
+            }
+
+            // محاكاة طلب API - في التطبيق الحقيقي، ستحتاج إلى استبدال هذا برابط API حقيقي
+            try {
+                // محاكاة استجابة API
+                const mockResponse = await mockAPICall(drug1, drug2);
+                
+                resultDiv.style.display = 'block';
+                severityDiv.className = 'interaction-level ' + mockResponse.severity;
+                severityDiv.textContent = mockResponse.severityText;
+
+                detailsList.innerHTML = '';
+                mockResponse.details.forEach(detail => {
+                    const li = document.createElement('li');
+                    li.textContent = detail;
+                    detailsList.appendChild(li);
+                });
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<div class="error">عذراً، حدث خطأ أثناء التحقق من التفاعل. الرجاء المحاولة مرة أخرى.</div>`;
+            }
+        }
+
+        // دالة محاكاة API للأغراض التوضيحية
+        async function mockAPICall(drug1, drug2) {
+            // محاكاة تأخير الشبكة
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // مجموعة من الاستجابات المحتملة للتوضيح
+            const responses = [
+                {
+                    severity: 'severe',
+                    severityText: 'تفاعل شديد',
+                    details: [
+                        '• يجب تجنب استخدام هذه الأدوية معاً',
+                        '• قد يؤدي الجمع بينهما إلى آثار جانبية خطيرة',
+                        '• استشر الطبيب فوراً للحصول على بدائل آمنة'
+                    ]
+                },
+                {
+                    severity: 'moderate',
+                    severityText: 'تفاعل متوسط',
+                    details: [
+                        '• يمكن استخدام الأدوية معاً تحت إشراف طبي',
+                        '• قد تحتاج إلى تعديل الجرعات',
+                        '• راقب الآثار الجانبية عن كثب'
+                    ]
+                },
+                {
+                    severity: 'mild',
+                    severityText: 'تفاعل خفيف',
+                    details: [
+                        '• التفاعل ذو أهمية سريرية منخفضة',
+                        '• راقب أي آثار جانبية بسيطة',
+                        '• لا يلزم عادةً تعديل العلاج'
+                    ]
+                },
+                {
+                    severity: 'none',
+                    severityText: 'لا يوجد تفاعل معروف',
+                    details: [
+                        '• لم يتم توثيق تفاعلات مهمة بين هذين الدوائين',
+                        '• يمكن استخدامهما معاً بأمان',
+                        '• استشر الصيدلي إذا ظهرت أي أعراض غير معتادة'
+                    ]
+                }
+            ];
+
+            // اختيار استجابة عشوائية للتوضيح
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+    </script>
+</body>
+</html>
